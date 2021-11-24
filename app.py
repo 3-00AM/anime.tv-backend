@@ -1,9 +1,7 @@
-from flask import Flask
 from model import *
 import requests
 import json
-import os
-
+from decouple import config
 
 app = Flask(__name__)  # keep it?
 
@@ -18,20 +16,27 @@ def index():  # put application's code here
     return json.dumps({'feedback': 'index page'})
 
 
-def get_all_anime():
-    url = "https://api.myanimelist.net/v2/anime?q=mushoku&fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics"
+def get_all_anime(query):
+    url = f"https://api.myanimelist.net/v2/anime?q={query}&fields=id,title,main_picture,alternative_titles," \
+          f"start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at," \
+          f"updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source," \
+          f"average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios," \
+          f"statistics "
 
     payload = {}
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + str(os.getenv("MAL_ACCESS_TOKEN"))
+        'Authorization': 'Bearer ' + config('MAL_ACCESS_TOKEN')
     }
 
-    response = requests.request("GET", url, headers=headers, data=payload)
+    response = requests.request("GET", url, headers=headers, data=payload).json()
 
-    return response.text
+    # try:
+    #     data = Anime(title, rank)
+
+    return json.dumps(response['data'][0]['node']['title'])
 
 
 if __name__ == '__main__':
-    print(get_all_anime())
+    print(get_all_anime(""))
     # app.run()

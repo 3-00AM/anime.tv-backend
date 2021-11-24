@@ -2,4 +2,5 @@ Flask==2.0.2
 Flask-Cors==3.0.10
 Flask-SQLAlchemy==2.5.1
 SQLAlchemy==1.4.27
-requests==2.25.0
+requests~=2.26.0
+python-decouple~=3.5
