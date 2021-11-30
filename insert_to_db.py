@@ -1,6 +1,9 @@
+import sys
+
 import requests
 
 from model import *
+from sqlalchemy.exc import IntegrityError
 
 payload = {}
 headers = {
@@ -59,15 +62,27 @@ if __name__ == '__main__':
         node = node['node']
         anime_id = node['id']
         anime_details = get_anime_by_id(anime_id)
-        anime = Anime(anime_details['id'], anime_details['title'], int(anime_details['rank']), int(
-            anime_details['popularity']), anime_details['media_type'], anime_details['status'], anime_details['rating'])
+        anime = Anime(
+            anime_details['id'],
+            anime_details['title'],
+            int(anime_details['rank']),
+            int(anime_details['popularity']),
+            anime_details['media_type'],
+            anime_details['status'],
+            anime_details['rating']
+        )
+        for g in anime_details['genres']:
+            genre = Genre(g['id'], g['name'])
+            genre.animes.append(anime)
         print("finished create class")
         try:
             db.session.add(anime)
             db.session.commit()
             print("Finished commit table")
-        except Exception as e:
-            print(e)
-            db.session.rollback()
+        except IntegrityError:
+            continue
+        # except Exception as e:
+        #     print(e)
+        #     db.session.rollback()
 
     print(get_all_anime())
