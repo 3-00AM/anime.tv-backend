@@ -89,31 +89,20 @@ if __name__ == '__main__':
             except IntegrityError:
                 print(f"Failed to add Genre: {g['name']} to db")
                 db.session.rollback()
+        print("finished insert anime")
 
-        for genre in db.session.query(Genre).all():
+    for genre in db.session.query(Genre).all():
+        for anime in db.session.query(Anime).all():
+            anime_details = get_anime_by_id(anime.mal_id)
             for g in anime_details['genres']:
-                if g['id'] == genre.mal_id:
+                if genre.mal_id == g['id']:
                     try:
                         print(
-                            f"Link Genre: {g['name']} and Anime: {anime.title}")
+                            f"Link Genre: {genre.name} and Anime: {anime.title}")
                         genre.animes.append(anime)
                         db.session.commit()
                     except Exception as e:
                         print(e)
                         db.session.rollback()
                         print(
-                            f"Failed to link Genre: {g['name']} and Anime: {anime.title}")
-
-        # for g in anime_details['genres']:
-        #     try:
-        #         # db.session.execute()
-        #         genre = Genre(g['id'], g['name'])
-        #         print(f"Link Genre: {g['name']} and Anime: {anime.title}")
-        #         genre.animes.append(anime)
-        #         db.session.commit()
-        #     except Exception as e:
-        #         print(e)
-        #         db.session.rollback()
-                # print(
-                #     f"Failed to link Genre: {g['name']} and Anime: {anime.title}")
-        print("finished insert anime")
+                            f"Failed to link Genre: {genre.name} and Anime: {anime.title}")
