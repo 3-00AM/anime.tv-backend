@@ -4,6 +4,7 @@ import requests
 
 from model import *
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.dialects.mysql import insert
 
 payload = {}
 headers = {
@@ -71,18 +72,48 @@ if __name__ == '__main__':
             anime_details['status'],
             anime_details['rating']
         )
-        for g in anime_details['genres']:
-            genre = Genre(g['id'], g['name'])
-            genre.animes.append(anime)
-        print("finished create class")
         try:
             db.session.add(anime)
             db.session.commit()
-            print("Finished commit table")
-        except IntegrityError:
-            continue
-        # except Exception as e:
-        #     print(e)
-        #     db.session.rollback()
+            print(f"Finished add Anime: {anime.title}")
+        except Exception as e:
+            print(e)
+            db.session.rollback()
 
-    print(get_all_anime())
+        for g in anime_details['genres']:
+            try:
+                print(f"Add Genre: {g['name']} to db")
+                genre = Genre(g['id'], g['name'])
+                db.session.add(genre)
+                db.session.commit()
+            except IntegrityError:
+                print(f"Failed to add Genre: {g['name']} to db")
+                db.session.rollback()
+
+        for genre in db.session.query(Genre).all():
+            for g in anime_details['genres']:
+                if g['id'] == genre.mal_id:
+                    try:
+                        print(
+                            f"Link Genre: {g['name']} and Anime: {anime.title}")
+                        genre.animes.append(anime)
+                        db.session.commit()
+                    except Exception as e:
+                        print(e)
+                        db.session.rollback()
+                        print(
+                            f"Failed to link Genre: {g['name']} and Anime: {anime.title}")
+
+        # for g in anime_details['genres']:
+        #     try:
+        #         # db.session.execute()
+        #         genre = Genre(g['id'], g['name'])
+        #         print(f"Link Genre: {g['name']} and Anime: {anime.title}")
+        #         genre.animes.append(anime)
+        #         db.session.commit()
+        #     except Exception as e:
+        #         print(e)
+        #         db.session.rollback()
+                # print(
+                #     f"Failed to link Genre: {g['name']} and Anime: {anime.title}")
+        print("finished insert anime")

@@ -88,25 +88,25 @@ class Anime(db.Model):
     """
     __tablename__ = 'anime'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer)
+    mal_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
     rank = db.Column(db.Integer)
     popularity = db.Column(db.Integer)
     genres = db.relationship('Genre',
-                             secondary=association_genres_table, backref=db.backref('animes'), lazy='dynamic')
+                             secondary=association_genres_table, backref=db.backref('animes', lazy='dynamic'))
     media_type = db.Column(db.String(50))
     status = db.Column(db.String(50))
     rating = db.Column(db.String(50))
     studios = db.relationship('Studio',
-                              secondary=association_studios_table, backref=db.backref('animes'), lazy='dynamic')
+                              secondary=association_studios_table, backref=db.backref('animes', lazy='dynamic'))
     related_anime = db.relationship('RelatedAnime',
                                     secondary=association_related_animes_table,
                                     backref=db.backref('animes', lazy='dynamic'))
     related_manga = db.relationship('Manga',
-                                    secondary=association_mangas_table, backref=db.backref('animes'), lazy='dynamic')
+                                    secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
     recommendation = db.relationship('Recommendation',
                                      secondary=association_recommendations_table,
-                                     backref=db.backref('animes'), lazy='dynamic')
+                                     backref=db.backref('animes', lazy='dynamic'))
 
     # db.Column(db.Date)
     # db.Column(db.Text())
@@ -146,8 +146,8 @@ class Genre(db.Model):
     """
     __tablename__ = 'genre'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer)
-    name = db.Column(db.String(100), unique=True)  # unique
+    mal_id = db.Column(db.Integer, unique=True)
+    name = db.Column(db.String(100))  # unique
 
     def __init__(self, mal_id, name):
         self.mal_id = mal_id
@@ -171,8 +171,8 @@ class Studio(db.Model):
     """
     __tablename__ = 'studio'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer)
-    name = db.Column(db.String(100), unique=True)  # unique
+    mal_id = db.Column(db.Integer, unique=True)
+    name = db.Column(db.String(100))  # unique
 
     def __init__(self, mal_id, name):
         self.mal_id = mal_id
@@ -196,7 +196,7 @@ class RelatedAnime(db.Model):
     """
     __tablename__ = 'related_anime'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer)
+    mal_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
 
     def __init__(self, mal_id, title):
@@ -221,7 +221,7 @@ class Manga(db.Model):
     """
     __tablename__ = 'manga'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer)
+    mal_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
 
     def __init__(self, mal_id, title):
@@ -246,7 +246,7 @@ class Recommendation(db.Model):
     """
     __tablename__ = 'recommendation'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer)
+    mal_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
 
     def __init__(self, mal_id, title):
