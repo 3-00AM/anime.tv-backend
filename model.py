@@ -33,10 +33,6 @@ association_genres_table = db.Table('association_genres',
                                               db.ForeignKey('anime.id')),
                                     db.Column('genre_id', db.Integer,
                                               db.ForeignKey('genre.id')),
-                                    db.Column('title', db.String(200),
-                                              db.ForeignKey('anime.title')),
-                                    db.Column('genre', db.String(100),
-                                              db.ForeignKey('genre.name'))
                                     )
 
 """Association table for Anime and Studio"""
@@ -45,10 +41,6 @@ association_studios_table = db.Table('association_studios',
                                                db.ForeignKey('anime.id')),
                                      db.Column('studio_id', db.Integer,
                                                db.ForeignKey('studio.id')),
-                                     db.Column('title', db.String(
-                                         200), db.ForeignKey('anime.title')),
-                                     db.Column('studio', db.String(
-                                         100), db.ForeignKey('studio.name'))
                                      )
 
 """Association table for Anime an RelatedAnime"""
@@ -57,10 +49,6 @@ association_related_animes_table = db.Table('association_related_animes',
                                                 'anime_id', db.Integer, db.ForeignKey('anime.id')),
                                             db.Column('related_anime_id', db.Integer,
                                                       db.ForeignKey('related_anime.id')),
-                                            db.Column('title', db.String(
-                                                200), db.ForeignKey('anime.title')),
-                                            db.Column('related_anime', db.String(200),
-                                                      db.ForeignKey('related_anime.title'))
                                             )
 
 """Association table for Anime an Manga"""
@@ -69,10 +57,6 @@ association_mangas_table = db.Table('association_mangas',
                                               db.ForeignKey('anime.id')),
                                     db.Column('manga_id', db.Integer,
                                               db.ForeignKey('manga.id')),
-                                    db.Column('title', db.String(200),
-                                              db.ForeignKey('anime.title')),
-                                    db.Column('manga', db.String(200),
-                                              db.ForeignKey('manga.title'))
                                     )
 
 """Association table for Anime an Recommendation"""
@@ -81,10 +65,6 @@ association_recommendations_table = db.Table('association_recommendations',
                                                  'anime_id', db.Integer, db.ForeignKey('anime.id')),
                                              db.Column('manga_id', db.Integer, db.ForeignKey(
                                                  'recommendation.id')),
-                                             db.Column('title', db.String(
-                                                 200), db.ForeignKey('anime.title')),
-                                             db.Column('recommendation', db.String(200),
-                                                       db.ForeignKey('recommendation.title'))
                                              )
 
 
@@ -106,26 +86,27 @@ class Anime(db.Model):
         related_manga       (varchar):  array of manga
         recommendations     (varchar):  array of recommendation
     """
+    __tablename__ = 'anime'
     id = db.Column(db.Integer, primary_key=True)  # primary key
     mal_id = db.Column(db.Integer)
     title = db.Column(db.String(200))
     rank = db.Column(db.Integer)
     popularity = db.Column(db.Integer)
     genres = db.relationship('Genre',
-                             secondary=association_genres_table, backref=db.backref('animes', lazy='dynamic'))
+                             secondary=association_genres_table, backref=db.backref('animes'), lazy='dynamic')
     media_type = db.Column(db.String(50))
     status = db.Column(db.String(50))
     rating = db.Column(db.String(50))
     studios = db.relationship('Studio',
-                              secondary=association_studios_table, backref=db.backref('animes', lazy='dynamic'))
+                              secondary=association_studios_table, backref=db.backref('animes'), lazy='dynamic')
     related_anime = db.relationship('RelatedAnime',
                                     secondary=association_related_animes_table,
                                     backref=db.backref('animes', lazy='dynamic'))
     related_manga = db.relationship('Manga',
-                                    secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
+                                    secondary=association_mangas_table, backref=db.backref('animes'), lazy='dynamic')
     recommendation = db.relationship('Recommendation',
                                      secondary=association_recommendations_table,
-                                     backref=db.backref('animes', lazy='dynamic'))
+                                     backref=db.backref('animes'), lazy='dynamic')
 
     # db.Column(db.Date)
     # db.Column(db.Text())
@@ -163,6 +144,7 @@ class Genre(db.Model):
         mal_id      (int):  My Anime List id
         name    (varchar):  genre name
     """
+    __tablename__ = 'genre'
     id = db.Column(db.Integer, primary_key=True)  # primary key
     mal_id = db.Column(db.Integer)
     name = db.Column(db.String(100), unique=True)  # unique
@@ -187,6 +169,7 @@ class Studio(db.Model):
         mal_id      (int):  My Anime List id
         name    (varchar):  studio name
     """
+    __tablename__ = 'studio'
     id = db.Column(db.Integer, primary_key=True)  # primary key
     mal_id = db.Column(db.Integer)
     name = db.Column(db.String(100), unique=True)  # unique
@@ -211,6 +194,7 @@ class RelatedAnime(db.Model):
         mal_id       (int):  My Anime List id
         title    (varchar):  related anime title
     """
+    __tablename__ = 'related_anime'
     id = db.Column(db.Integer, primary_key=True)  # primary key
     mal_id = db.Column(db.Integer)
     title = db.Column(db.String(200))
@@ -235,6 +219,7 @@ class Manga(db.Model):
         mal_id       (int):  My Anime List id
         title    (varchar):  manga title
     """
+    __tablename__ = 'manga'
     id = db.Column(db.Integer, primary_key=True)  # primary key
     mal_id = db.Column(db.Integer)
     title = db.Column(db.String(200))
@@ -259,6 +244,7 @@ class Recommendation(db.Model):
         mal_id       (int):  My Anime List id
         title    (varchar):  anime title
     """
+    __tablename__ = 'recommendation'
     id = db.Column(db.Integer, primary_key=True)  # primary key
     mal_id = db.Column(db.Integer)
     title = db.Column(db.String(200))
