@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 from decouple import config
 import logging
 
@@ -28,63 +27,249 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
+"""Association table for Anime and Genre"""
+association_genres_table = db.Table('association_genres',
+                                    db.Column('anime_id', db.Integer,
+                                              db.ForeignKey('anime.id')),
+                                    db.Column('genre_id', db.Integer,
+                                              db.ForeignKey('genre.id')),
+                                    db.Column('title', db.String(200),
+                                              db.ForeignKey('anime.title')),
+                                    db.Column('genre', db.String(100),
+                                              db.ForeignKey('genre.name'))
+                                    )
+
+"""Association table for Anime and Studio"""
+association_studios_table = db.Table('association_studios',
+                                     db.Column('anime_id', db.Integer,
+                                               db.ForeignKey('anime.id')),
+                                     db.Column('studio_id', db.Integer,
+                                               db.ForeignKey('studio.id')),
+                                     db.Column('title', db.String(
+                                         200), db.ForeignKey('anime.title')),
+                                     db.Column('studio', db.String(
+                                         100), db.ForeignKey('studio.name'))
+                                     )
+
+"""Association table for Anime an RelatedAnime"""
+association_related_animes_table = db.Table('association_related_animes',
+                                            db.Column(
+                                                'anime_id', db.Integer, db.ForeignKey('anime.id')),
+                                            db.Column('related_anime_id', db.Integer,
+                                                      db.ForeignKey('related_anime.id')),
+                                            db.Column('title', db.String(
+                                                200), db.ForeignKey('anime.title')),
+                                            db.Column('related_anime', db.String(200),
+                                                      db.ForeignKey('related_anime.title'))
+                                            )
+
+"""Association table for Anime an Manga"""
+association_mangas_table = db.Table('association_mangas',
+                                    db.Column('anime_id', db.Integer,
+                                              db.ForeignKey('anime.id')),
+                                    db.Column('manga_id', db.Integer,
+                                              db.ForeignKey('manga.id')),
+                                    db.Column('title', db.String(200),
+                                              db.ForeignKey('anime.title')),
+                                    db.Column('manga', db.String(200),
+                                              db.ForeignKey('manga.title'))
+                                    )
+
+"""Association table for Anime an Recommendation"""
+association_recommendations_table = db.Table('association_recommendations',
+                                             db.Column(
+                                                 'anime_id', db.Integer, db.ForeignKey('anime.id')),
+                                             db.Column('manga_id', db.Integer, db.ForeignKey(
+                                                 'recommendation.id')),
+                                             db.Column('title', db.String(
+                                                 200), db.ForeignKey('anime.title')),
+                                             db.Column('recommendation', db.String(200),
+                                                       db.ForeignKey('recommendation.title'))
+                                             )
+
 
 class Anime(db.Model):
     """
     A class to represent a citizen.
     Attributes:
-        id              (int):       anime ID
-        title           (varchar):  anime name
-        rank            (int):      rank of that anime
-        popularity      (int):      
-        genres          (varchar):  array of genre
-        media_type      (varchar):  type of media of the anime
-        status          (varchar):  status of that anime
-        rating          (varchar):  rating of that anime
-        studios         (varchar):  array of studios
-        # related_anime   (varchar):  array of related anime
-        # related_manga   (varchar):  array of manga
-        # recommendations (varchar):  array of recommendation
+        id                      (int):  anime ID
+        mal_id                  (int):  My Anime List id
+        title               (varchar):  anime title
+        rank                    (int):  rank of the anime
+        popularity              (int):      
+        genres              (varchar):  genre of the anime
+        media_type          (varchar):  type of media of the anime
+        status              (varchar):  status of the anime
+        rating              (varchar):  rating of the anime
+        studios             (varchar):  array of studios
+        related_anime       (varchar):  array of related anime
+        related_manga       (varchar):  array of manga
+        recommendations     (varchar):  array of recommendation
     """
-    __tablename__ = 'anime'
     id = db.Column(db.Integer, primary_key=True)  # primary key
+    mal_id = db.Column(db.Integer)
     title = db.Column(db.String(200))
     rank = db.Column(db.Integer)
     popularity = db.Column(db.Integer)
-    genres = db.Column(db.ARRAY(db.String(50)))
+    genres = db.relationship('Genre',
+                             secondary=association_genres_table, backref=db.backref('animes', lazy='dynamic'))
     media_type = db.Column(db.String(50))
     status = db.Column(db.String(50))
     rating = db.Column(db.String(50))
-    studios = db.Column(db.ARRAY(db.String(200)))
-    # related_anime = db.Column(db.ARRAY(db.String(200)))
-    # related_manga = db.Column(db.ARRAY(db.String(200)))
-    # recommendations = db.Column(db.ARRAY(db.String(200)))
+    studios = db.relationship('Studio',
+                              secondary=association_studios_table, backref=db.backref('animes', lazy='dynamic'))
+    related_anime = db.relationship('RelatedAnime',
+                                    secondary=association_related_animes_table,
+                                    backref=db.backref('animes', lazy='dynamic'))
+    related_manga = db.relationship('Manga',
+                                    secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
+    recommendation = db.relationship('Recommendation',
+                                     secondary=association_recommendations_table,
+                                     backref=db.backref('animes', lazy='dynamic'))
 
     # db.Column(db.Date)
     # db.Column(db.Text())
     # db.Column(db.Boolean)
     # db.Column(db.PickleType())
 
-    def __init__(self, title, rank, popularity, genres, media_type, status, rating, studios):
+    def __init__(self, mal_id, title, rank, popularity, media_type, status, rating):
+        self.mal_id = mal_id
         self.title = title
         self.rank = rank
         self.popularity = popularity
-        self.genres = genres
         self.media_type = media_type
         self.status = status
         self.rating = rating
-        self.studios = studios
 
     def get_dict(self):
         return {
+            '_id': self.id,
+            'mal_id': self.mal_id,
             'title': self.title,
             'rank': self.rank,
             'popularity': self.popularity,
             'genres': self.genres,
             'media_type': self.media_type,
             'status': self.status,
-            'studios': self.studios,
-            # 'related_anime': self.related_anime,
-            # 'related_manga': self.related_manga,
-            # 'recommendations': self.recommendations,
+            'studios': self.studios
+        }
+
+
+class Genre(db.Model):
+    """
+    A class to represent a genre.
+    Attributes:
+        id          (int):  genre ID
+        mal_id      (int):  My Anime List id
+        name    (varchar):  genre name
+    """
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    mal_id = db.Column(db.Integer)
+    name = db.Column(db.String(100), unique=True)  # unique
+
+    def __init__(self, mal_id, name):
+        self.mal_id = mal_id
+        self.name = name
+
+    def get_dict(self):
+        return {
+            '_id': self.id,
+            'mal_id': self.mal_id,
+            'name': self.name,
+        }
+
+
+class Studio(db.Model):
+    """
+    A class to represent a genre.
+    Attributes:
+        id          (int):  studio ID
+        mal_id      (int):  My Anime List id
+        name    (varchar):  studio name
+    """
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    mal_id = db.Column(db.Integer)
+    name = db.Column(db.String(100), unique=True)  # unique
+
+    def __init__(self, mal_id, name):
+        self.mal_id = mal_id
+        self.name = name
+
+    def get_dict(self):
+        return {
+            '_id': self.id,
+            'mal_id': self.mal_id,
+            'name': self.name,
+        }
+
+
+class RelatedAnime(db.Model):
+    """
+    A class to represent a genre.
+    Attributes:
+        id           (int):  related anime ID
+        mal_id       (int):  My Anime List id
+        title    (varchar):  related anime title
+    """
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    mal_id = db.Column(db.Integer)
+    title = db.Column(db.String(200))
+
+    def __init__(self, mal_id, title):
+        self.mal_id = mal_id
+        self.title = title
+
+    def get_dict(self):
+        return {
+            '_id': self.id,
+            'mal_id': self.mal_id,
+            'title': self.title,
+        }
+
+
+class Manga(db.Model):
+    """
+    A class to represent a genre.
+    Attributes:
+        id           (int):  manga ID
+        mal_id       (int):  My Anime List id
+        title    (varchar):  manga title
+    """
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    mal_id = db.Column(db.Integer)
+    title = db.Column(db.String(200))
+
+    def __init__(self, mal_id, title):
+        self.mal_id = mal_id
+        self.title = title
+
+    def get_dict(self):
+        return {
+            '_id': self.id,
+            'mal_id': self.mal_id,
+            'title': self.title,
+        }
+
+
+class Recommendation(db.Model):
+    """
+    A class to represent a genre.
+    Attributes:
+        id           (int):  recommendation ID
+        mal_id       (int):  My Anime List id
+        title    (varchar):  anime title
+    """
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    mal_id = db.Column(db.Integer)
+    title = db.Column(db.String(200))
+
+    def __init__(self, mal_id, title):
+        self.mal_id = mal_id
+        self.title = title
+
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'mal_id': self.mal_id,
+            'title': self.title,
         }
