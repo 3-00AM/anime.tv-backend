@@ -43,6 +43,66 @@ def get_anime_by_id(anime_id):
     return response
 
 
+def insert_sub_table(db, anime_details, Table, key, arg1, arg2):
+    for g in anime_details[key]:
+        try:
+            print(f"Add {key}: {g[arg2]} to db")
+            data = Table(g[arg1], g[arg2])
+            db.session.add(data)
+            db.session.commit()
+        except IntegrityError:
+            print(f"Failed to add {key}: {g[arg2]} to db")
+            db.session.rollback()
+
+
+def insert_sub_table_with_node(db, anime_details, Table, key, arg1, arg2):
+    for n in anime_details[key]:
+        try:
+            print(f"Add {key}: {n['node'][arg2]} to db")
+            data = Table(n['node'][arg1], n['node'][arg2])
+            db.session.add(data)
+            db.session.commit()
+        except IntegrityError:
+            print(f"Failed to add {key}: {n['node'][arg2]} to db")
+            db.session.rollback()
+
+
+def link_association(db, Table, key):
+    for x in db.session.query(Table).all():
+        for anime in db.session.query(Anime).all():
+            anime_details = get_anime_by_id(anime.mal_id)
+            for g in anime_details[key]:
+                if x.mal_id == g['id']:
+                    try:
+                        print(
+                            f"Link {key}: {x.mal_id} and Anime: {anime.title}")
+                        x.animes.append(anime)
+                        db.session.commit()
+                    except Exception as e:
+                        print(e)
+                        db.session.rollback()
+                        print(
+                            f"Failed to link {key}: {x.mal_id} and Anime: {anime.title}")
+
+
+def link_association_with_node(db, Table, key):
+    for x in db.session.query(Table).all():
+        for anime in db.session.query(Anime).all():
+            anime_details = get_anime_by_id(anime.mal_id)
+            for g in anime_details[key]:
+                if x.mal_id == g['node']['id']:
+                    try:
+                        print(
+                            f"Link {key}: {x.mal_id} and Anime: {anime.title}")
+                        x.animes.append(anime)
+                        db.session.commit()
+                    except Exception as e:
+                        print(e)
+                        db.session.rollback()
+                        print(
+                            f"Failed to link {key}: {x.mal_id} and Anime: {anime.title}")
+
+
 """ Use Case
 anime7 = Anime(id=7, 'Arifureta', ... ,... ,...)
 genre9 = Genre(id=9, 'Isekai')
@@ -82,30 +142,13 @@ if __name__ == '__main__':
             print(e)
             db.session.rollback()
 
-        for g in anime_details['genres']:
-            try:
-                # insert genre
-                print(f"Add Genre: {g['name']} to db")
-                genre = Genre(g['id'], g['name'])
-                db.session.add(genre)
-                db.session.commit()
-            except IntegrityError:
-                print(f"Failed to add Genre: {g['name']} to db")
-                db.session.rollback()
-        print("finished insert anime")
+        insert_sub_table(db, anime_details, Genre, 'genres', 'id', 'name')
+        insert_sub_table(db, anime_details, Studio, 'studios', 'id', 'name')
+        insert_sub_table_with_node(db, anime_details, RelatedAnime, 'related_anime', 'id', 'title')
+        insert_sub_table_with_node(db, anime_details, Recommendation, 'recommendations', 'id', 'title')
+        print("Finished insert anime.\n")
 
-    for genre in db.session.query(Genre).all():
-        for anime in db.session.query(Anime).all():
-            anime_details = get_anime_by_id(anime.mal_id)
-            for g in anime_details['genres']:
-                if genre.mal_id == g['id']:
-                    try:
-                        print(
-                            f"Link Genre: {genre.name} and Anime: {anime.title}")
-                        genre.animes.append(anime)
-                        db.session.commit()
-                    except Exception as e:
-                        print(e)
-                        db.session.rollback()
-                        print(
-                            f"Failed to link Genre: {genre.name} and Anime: {anime.title}")
+    link_association(db, Genre, 'genres')
+    link_association(db, Studio, 'studios')
+    link_association_with_node(db, RelatedAnime, 'related_anime')
+    link_association_with_node(db, Recommendation, 'recommendations')
