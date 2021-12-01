@@ -4,3 +4,5 @@ Flask-SQLAlchemy==2.5.1
 SQLAlchemy==1.4.27
 requests~=2.26.0
 python-decouple~=3.5
+flasgger==0.9.5
+flask-swagger==0.2.14

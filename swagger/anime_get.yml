@@ -1,0 +1,12 @@
+tags:
+  - name: Anime
+summary: Send html template that display anime's information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display all anime
+  400:
+    description: Bad request
