@@ -1,0 +1,12 @@
+tags:
+  - name: Manga
+summary: Send html template that display manga's information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display all manga
+  400:
+    description: Bad request

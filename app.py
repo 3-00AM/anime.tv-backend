@@ -82,5 +82,25 @@ def genre_search():
     return json.dumps(genre_list)
 
 
+@app.route('/genre/search', methods=['GET'])
+@swag_from("swagger/genre_search_get.yml")
+def genre_search():
+    name = request.args.get('keyword')
+    genre_list = []
+    for genre in db.session.query(Genre).all():
+        if name.lower() in genre.name.lower():
+            genre_list.append(genre.get_dict())
+    return json.dumps(genre_list)
+
+
+@app.route('/manga', methods=['GET'])
+@swag_from("swagger/manga_get.yml")
+def manga():
+    manga_list = []
+    for manga in db.session.query(Manga).all():
+        manga_list.append(manga.get_dict())
+    return json.dumps(manga_list)
+
+
 if __name__ == '__main__':
     app.run()
