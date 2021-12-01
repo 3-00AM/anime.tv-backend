@@ -1,3 +1,5 @@
+from turtle import title
+
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -216,12 +218,12 @@ class Manga(db.Model):
     A class to represent a genre.
     Attributes:
         id           (int):  manga ID
-        mal_id       (int):  My Anime List id
+        kitsu_id       (int):  My Anime List id
         title    (varchar):  manga title
     """
     __tablename__ = 'manga'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer, unique=True)
+    kitsu_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
 
     def __init__(self, mal_id, title):
@@ -259,3 +261,14 @@ class Recommendation(db.Model):
             'mal_id': self.mal_id,
             'title': self.title,
         }
+
+
+class Theme(db.Model):
+    """
+    A Class to represent a Theme table.
+    Attributes:
+        id              (int): theme ID.
+        arrupi_ID       (int): arrupi id.
+        title       (varchar): title of theme.
+        type        (varchar): type of that songs eg. opening, ending.
+    """
