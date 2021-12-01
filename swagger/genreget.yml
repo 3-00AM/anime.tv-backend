@@ -1,0 +1,12 @@
+tags:
+  - name: Genre
+summary: Send html template that display genre's information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display all genre
+  400:
+    description: Bad request
