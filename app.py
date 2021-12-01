@@ -31,13 +31,16 @@ swagger_config = {
 }
 swagger = Swagger(app, config=swagger_config)
 
+
 @app.route('/', methods=['GET'])
 def hello_world():
     return json.dumps({'feedback': 'End of the world!!! ~~ sono chi no kioku ~~'})
 
+
 @app.route('/index', methods=['GET'])
 def index():
     return hello_world()
+
 
 @app.route('/anime', methods=['GET'])
 @swag_from("swagger/anime_get.yml")
@@ -47,6 +50,7 @@ def anime():
         anime_list.append(anime.get_dict())
     return json.dumps(anime_list)
 
+
 @app.route('/genre', methods=['GET'])
 @swag_from("swagger/genre_get.yml")
 def genre():
@@ -54,6 +58,7 @@ def genre():
     for genre in db.session.query(Genre).all():
         genre_list.append(genre.get_dict())
     return json.dumps(genre_list)
+
 
 @app.route('/anime/search', methods=['GET'])
 @swag_from("swagger/anime_search_get.yml")
@@ -64,6 +69,7 @@ def anime_search():
         if title.lower() in anime.title.lower():
             anime_list.append(anime.get_dict())
     return json.dumps(anime_list)
+
 
 @app.route('/genre/search', methods=['GET'])
 @swag_from("swagger/genre_search_get.yml")
