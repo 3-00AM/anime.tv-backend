@@ -142,7 +142,7 @@ class Anime(db.Model):
             'status': self.status,
             'studios': studio_list,
             'related_anime': related_anime_list,
-            'recommendation': recommendation_list,
+            'recommendations': recommendation_list,
         }
 
 

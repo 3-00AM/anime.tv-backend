@@ -65,9 +65,42 @@ def genre():
 def anime_search():
     keyword = request.args.get('keyword')
     anime_list = []
-    for a in db.session.query(Anime).all():
-        if keyword.lower() in a.title.lower():
-            anime_list.append(a.get_dict())
+    for anime in db.session.query(Anime).all():
+        anime_dict = anime.get_dict()
+        if keyword.lower() in anime_dict['title'].lower():
+            anime_list.append(anime_dict)
+            continue
+        """ 4 For loop of origin
+        for genre in anime_dict['genres']:
+            if keyword in genre['name']:
+                anime_list.append(anime_dict)
+                continue
+        for studio in anime_dict['studios']:
+            if keyword in studio['name']:
+                anime_list.append(anime_dict)
+                continue
+        for related_anime in anime_dict['related_anime']:
+            if keyword in related_anime['title']:
+                anime_list.append(anime_dict)
+                continue
+        for recommendation in anime_dict['recommendations']:
+            if keyword in related_anime['title']:
+                anime_list.append(anime_dict)
+                continue
+        """
+        key_check_list = {
+            'genres': 'name',
+            'studios': 'name',
+            'related_anime': 'title',
+            'recommendations': 'title',
+        }
+        # Those 4 for loop into this 1 for loop
+        for key, checkee in key_check_list.items():
+            for keyee in anime_dict[key]:
+                if keyword in keyee[checkee].lower():
+                    anime_list.append(anime_dict)
+                    continue
+        
     return json.dumps(anime_list)
 
 
