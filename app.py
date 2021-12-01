@@ -51,15 +51,6 @@ def anime():
     return json.dumps(anime_list)
 
 
-@app.route('/genre', methods=['GET'])
-@swag_from("swagger/genre_get.yml")
-def genre():
-    genre_list = []
-    for g in db.session.query(Genre).all():
-        genre_list.append(g.get_dict())
-    return json.dumps(genre_list)
-
-
 @app.route('/anime/search', methods=['GET'])
 @swag_from("swagger/anime_search_get.yml")
 def anime_search():
@@ -100,8 +91,17 @@ def anime_search():
                 if keyword in keyee[checkee].lower():
                     anime_list.append(anime_dict)
                     continue
-        
+
     return json.dumps(anime_list)
+
+
+@app.route('/genre', methods=['GET'])
+@swag_from("swagger/genre_get.yml")
+def genre():
+    genre_list = []
+    for g in db.session.query(Genre).all():
+        genre_list.append(g.get_dict())
+    return json.dumps(genre_list)
 
 
 @app.route('/genre/search', methods=['GET'])
@@ -113,6 +113,26 @@ def genre_search():
         if keyword.lower() in g.name.lower():
             genre_list.append(g.get_dict())
     return json.dumps(genre_list)
+
+
+@app.route('/studio', methods=['GET'])
+@swag_from("swagger/studio_get.yml")
+def studio():
+    studio_list = []
+    for studio in db.session.query(Studio).all():
+        studio_list.append(studio.get_dict())
+    return json.dumps(studio_list)
+
+
+@app.route('/studio/search', methods=['GET'])
+@swag_from("swagger/studio_search_get.yml")
+def studio_search():
+    keyword = request.args.get('keyword')
+    studio_list = []
+    for studio in db.session.query(Studio).all():
+        if keyword.lower() in studio.name.lower():
+            studio_list.append(studio.get_dict())
+    return json.dumps(studio_list)
 
 
 @app.route('/manga', methods=['GET'])

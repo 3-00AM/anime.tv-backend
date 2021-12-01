@@ -7,6 +7,6 @@ produces:
   - "application/json"
 responses:
   200:
-    description: Return html template display all theme
+    description: Return html template display all themes
   400:
     description: Bad request
