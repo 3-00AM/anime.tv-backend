@@ -54,13 +54,6 @@ association_related_animes_table = db.Table('association_related_animes',
                                                       db.ForeignKey('related_anime.id')),
                                             )
 
-"""Association table for Anime an Manga"""
-association_mangas_table = db.Table('association_mangas',
-                                    db.Column('anime_id', db.Integer,
-                                              db.ForeignKey('anime.id')),
-                                    db.Column('manga_id', db.Integer,
-                                              db.ForeignKey('manga.id')),
-                                    )
 
 """Association table for Anime an Theme"""
 association_themes_table = db.Table('association_themes',
@@ -159,7 +152,7 @@ class Anime(db.Model):
             'status': self.status,
             'studios': studio_list,
             'related_anime': related_anime_list,
-            'recommendation': recommendation_list,
+            'recommendations': recommendation_list,
         }
 
 
@@ -282,7 +275,7 @@ class Recommendation(db.Model):
 
     def get_dict(self):
         return {
-            'id': self.id,
+            '_id': self.id,
             'mal_id': self.mal_id,
             'title': self.title,
         }
@@ -307,7 +300,7 @@ class Theme(db.Model):
 
     def get_dict(self):
         return {
-            'id': self.id,
+            '_id': self.id,
             'title': self.title,
             'type': self.type
         }

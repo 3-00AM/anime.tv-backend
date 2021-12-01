@@ -1,0 +1,12 @@
+tags:
+  - name: Studio
+summary: Send html template that display studio's information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display all studios
+  400:
+    description: Bad request
