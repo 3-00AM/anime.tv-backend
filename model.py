@@ -46,7 +46,7 @@ association_studios_table = db.Table('association_studios',
                                                db.ForeignKey('studio.id')),
                                      )
 
-"""Association table for Anime an RelatedAnime"""
+"""Association table for Anime and RelatedAnime"""
 association_related_animes_table = db.Table('association_related_animes',
                                             db.Column(
                                                 'anime_id', db.Integer, db.ForeignKey('anime.id')),
@@ -55,7 +55,16 @@ association_related_animes_table = db.Table('association_related_animes',
                                             )
 
 
-"""Association table for Anime an Theme"""
+"""Association table for Anime an Manga"""
+association_mangas_table = db.Table('association_mangas',
+                                    db.Column('anime_id', db.Integer,
+                                              db.ForeignKey('anime.id')),
+                                    db.Column('manga_id', db.Integer,
+                                              db.ForeignKey('manga.id')),
+                                    )
+
+
+"""Association table for Anime and Theme"""
 association_themes_table = db.Table('association_themes',
                                     db.Column('anime_id', db.Integer,
                                               db.ForeignKey('anime.id')),
@@ -63,7 +72,7 @@ association_themes_table = db.Table('association_themes',
                                               db.ForeignKey('theme.id')),
                                     )
 
-"""Association table for Anime an Recommendation"""
+"""Association table for Anime and Recommendation"""
 association_recommendations_table = db.Table('association_recommendations',
                                              db.Column(
                                                  'anime_id', db.Integer, db.ForeignKey('anime.id')),
@@ -132,15 +141,21 @@ class Anime(db.Model):
         genre_list = []
         studio_list = []
         related_anime_list = []
+        related_manga_list = []
         recommendation_list = []
+        related_theme_list = []
         for genre in self.genres:
             genre_list.append(genre.get_dict())
+        for manga in self.related_manga:
+            related_manga_list.append(manga.get_dict())
         for studio in self.studios:
             studio_list.append(studio.get_dict())
         for related_anime in self.related_anime:
             related_anime_list.append(related_anime.get_dict())
         for recommendation in self.recommendations:
             recommendation_list.append(recommendation.get_dict())
+        for related_theme in self.related_theme:
+            related_theme_list.append(related_theme.get_dict())
         return {
             '_id': self.id,
             'mal_id': self.mal_id,
@@ -152,7 +167,9 @@ class Anime(db.Model):
             'status': self.status,
             'studios': studio_list,
             'related_anime': related_anime_list,
+            'related_manga': related_manga_list,
             'recommendations': recommendation_list,
+            'related_theme': related_theme_list,
         }
 
 
