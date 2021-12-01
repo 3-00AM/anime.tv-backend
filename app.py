@@ -102,5 +102,14 @@ def manga_search():
     return json.dumps(manga_list)
 
 
+@app.route('/theme', methods=['GET'])
+@swag_from("swagger/theme_get.yml")
+def theme():
+    theme_list = []
+    for theme in db.session.query(Theme).all():
+        theme_list.append(theme.get_dict())
+    return json.dumps(theme_list)
+
+
 if __name__ == '__main__':
     app.run()
