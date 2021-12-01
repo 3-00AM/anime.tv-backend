@@ -27,12 +27,21 @@ def genre():
 
 @app.route('/anime/search', methods=['GET'])
 def anime_search():
-    title = request.args.get('title')
+    title = request.args.get('keyword')
     anime_list = []
     for anime in db.session.query(Anime).all():
         if title.lower() in anime.title.lower():
             anime_list.append(anime.get_dict())
     return json.dumps(anime_list)
+
+@app.route('/genre/search', methods=['GET'])
+def genre_search():
+    name = request.args.get('keyword')
+    genre_list = []
+    for genre in db.session.query(Genre).all():
+        if name.lower() in genre.name.lower():
+            genre_list.append(genre.get_dict())
+    return json.dumps(genre_list)
 
 
 if __name__ == '__main__':
