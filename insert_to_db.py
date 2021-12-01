@@ -59,6 +59,7 @@ db.session.commit()
 if __name__ == '__main__':
     db.create_all()
     db.session.commit()
+    # Insert all data into database.
     for node in get_all_anime():
         node = node['node']
         anime_id = node['id']
@@ -73,6 +74,7 @@ if __name__ == '__main__':
             anime_details['rating']
         )
         try:
+            # insert anime
             db.session.add(anime)
             db.session.commit()
             print(f"Finished add Anime: {anime.title}")
@@ -82,6 +84,7 @@ if __name__ == '__main__':
 
         for g in anime_details['genres']:
             try:
+                # insert genre
                 print(f"Add Genre: {g['name']} to db")
                 genre = Genre(g['id'], g['name'])
                 db.session.add(genre)
