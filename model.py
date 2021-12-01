@@ -1,3 +1,4 @@
+from enum import unique
 from turtle import title
 
 from flask import Flask
@@ -107,8 +108,8 @@ class Anime(db.Model):
     related_manga = db.relationship('Manga',
                                     secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
     recommendations = db.relationship('Recommendation',
-                                     secondary=association_recommendations_table,
-                                     backref=db.backref('animes', lazy='dynamic'))
+                                      secondary=association_recommendations_table,
+                                      backref=db.backref('animes', lazy='dynamic'))
 
     # db.Column(db.Date)
     # db.Column(db.Text())
@@ -228,7 +229,7 @@ class Manga(db.Model):
     A class to represent a genre.
     Attributes:
         id           (int):  manga ID
-        kitsu_id       (int):  My Anime List id
+        kitsu_id     (int):  My Anime List id
         title    (varchar):  manga title
     """
     __tablename__ = 'manga'
@@ -236,14 +237,14 @@ class Manga(db.Model):
     kitsu_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
 
-    def __init__(self, mal_id, title):
-        self.mal_id = mal_id
+    def __init__(self, kitsu_id, title):
+        self.kitsu_id = kitsu_id
         self.title = title
 
     def get_dict(self):
         return {
             '_id': self.id,
-            'mal_id': self.mal_id,
+            'kitsu_id': self.kitsu_id,
             'title': self.title,
         }
 
@@ -278,7 +279,21 @@ class Theme(db.Model):
     A Class to represent a Theme table.
     Attributes:
         id              (int): theme ID.
-        arrupi_ID       (int): arrupi id.
         title       (varchar): title of theme.
         type        (varchar): type of that songs eg. opening, ending.
     """
+    __tablename__ = 'theme'
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    title = db.Column(db.String(200), unique=True)
+    type = db.Column(db.String(200))
+
+    def __init__(self, title, type):
+        self.title = title
+        self.type = type
+
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'type': self.type
+        }

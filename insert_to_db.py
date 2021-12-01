@@ -1,8 +1,7 @@
-import sys
-
 import requests
 
 from model import *
+from urllib.parse import quote
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.dialects.mysql import insert
 
@@ -35,12 +34,77 @@ def get_all_anime():
 
 
 def get_anime_by_id(anime_id):
-    url = f"https://api.myanimelist.net/v2/anime/{anime_id}?fields=id,title,rank,popularity,media_type,status,rating,studios,genres,related_anime,related_manga,recommendations"
+    url = f"https://api.myanimelist.net/v2/anime/{anime_id}?fields=id,title,rank,popularity,media_type,status,rating,studios,genres,related_anime,recommendations"
 
     response = requests.request(
         "GET", url, headers=headers, data=payload).json()
 
     return response
+
+
+def get_manga_by_name(name):
+    url = f"https://kitsu.io/api/edge/manga?filter[text]={quote(name)}&fields[manga]=canonicalTitle"
+
+    response = requests.request(
+        "GET", url, headers=headers, data=payload).json()
+
+    return response
+
+
+def get_theme_by_name(name):
+    url = f"https://aruppi-api.herokuapp.com/api/v3/themes/{name}"
+
+    response = requests.request(
+        "GET", url, headers=headers, data=payload).json()
+
+    return response
+
+
+def insert_manga_table(db):
+    for a in db.session.query(Anime).all():
+        for data in get_manga_by_name(a.title)['data']:
+            m_id = int(data['id'])
+            m_title = data['attributes']['canonicalTitle']
+            manga = Manga(m_id, m_title)
+            try:
+                print(f"Add Manga: {m_title} to db")
+                db.session.add(manga)
+                db.session.commit()
+            except Exception as exception:
+                print(exception)
+                print(f"Failed to add Manga: {m_title} to db")
+                db.session.rollback()
+
+            try:
+                print(f"Link Manga: {m_title} to Anime: {a.title}")
+                manga.animes.append(a)
+            except Exception as exception:
+                print(exception)
+                print(f"Failed to link Manga: {m_title} to Anime: {a.title}")
+                db.session.rollback()
+
+
+def insert_theme_table(db):
+    for a in db.session.query(Anime).all():
+        for data in get_theme_by_name(a.title)['themes']['themes']:
+            t_title = data['title']
+            t_type = data['type']
+            theme = Theme(t_title, t_type)
+            try:
+                print(f"Add Theme: {t_title} to db")
+                db.session.add(theme)
+                db.session.commit()
+            except IntegrityError:
+                print(f"Failed to add Theme: {t_title} to db")
+                db.session.rollback()
+
+            try:
+                print(f"Link Manga: {t_title} to Anime: {a.title}")
+                theme.animes.append(a)
+            except Exception as exception:
+                print(exception)
+                print(f"Failed to link Manga: {t_title} to Anime: {a.title}")
+                db.session.rollback()
 
 
 def insert_sub_table(db, anime_details, Table, key, arg1, arg2):
@@ -69,38 +133,33 @@ def insert_sub_table_with_node(db, anime_details, Table, key, arg1, arg2):
 
 def link_association(db, Table, key):
     for x in db.session.query(Table).all():
-        for anime in db.session.query(Anime).all():
-            anime_details = get_anime_by_id(anime.mal_id)
-            for g in anime_details[key]:
+        for a in db.session.query(Anime).all():
+            a_detail = get_anime_by_id(a.mal_id)
+            for g in a_detail[key]:
                 if x.mal_id == g['id']:
-                    try:
-                        print(
-                            f"Link {key}: {x.mal_id} and Anime: {anime.title}")
-                        x.animes.append(anime)
-                        db.session.commit()
-                    except Exception as e:
-                        print(e)
-                        db.session.rollback()
-                        print(
-                            f"Failed to link {key}: {x.mal_id} and Anime: {anime.title}")
+                    add_and_submit_to_db(a, db, key, x)
 
 
 def link_association_with_node(db, Table, key):
     for x in db.session.query(Table).all():
-        for anime in db.session.query(Anime).all():
-            anime_details = get_anime_by_id(anime.mal_id)
-            for g in anime_details[key]:
+        for a in db.session.query(Anime).all():
+            a_detail = get_anime_by_id(a.mal_id)
+            for g in a_detail[key]:
                 if x.mal_id == g['node']['id']:
-                    try:
-                        print(
-                            f"Link {key}: {x.mal_id} and Anime: {anime.title}")
-                        x.animes.append(anime)
-                        db.session.commit()
-                    except Exception as e:
-                        print(e)
-                        db.session.rollback()
-                        print(
-                            f"Failed to link {key}: {x.mal_id} and Anime: {anime.title}")
+                    add_and_submit_to_db(a, db, key, x)
+
+
+def add_and_submit_to_db(a, db, key, x):
+    try:
+        print(
+            f"Link {key}: {x.mal_id} and Anime: {a.title}")
+        x.animes.append(a)
+        db.session.commit()
+    except Exception as exception:
+        print(exception)
+        db.session.rollback()
+        print(
+            f"Failed to link {key}: {x.mal_id} and Anime: {a.title}")
 
 
 """ Use Case
@@ -119,36 +178,40 @@ db.session.commit()
 if __name__ == '__main__':
     db.create_all()
     db.session.commit()
-    # Insert all data into database.
-    for node in get_all_anime():
-        node = node['node']
-        anime_id = node['id']
-        anime_details = get_anime_by_id(anime_id)
-        anime = Anime(
-            anime_details['id'],
-            anime_details['title'],
-            int(anime_details['rank']),
-            int(anime_details['popularity']),
-            anime_details['media_type'],
-            anime_details['status'],
-            anime_details['rating']
-        )
-        try:
-            # insert anime
-            db.session.add(anime)
-            db.session.commit()
-            print(f"Finished add Anime: {anime.title}")
-        except Exception as e:
-            print(e)
-            db.session.rollback()
 
-        insert_sub_table(db, anime_details, Genre, 'genres', 'id', 'name')
-        insert_sub_table(db, anime_details, Studio, 'studios', 'id', 'name')
-        insert_sub_table_with_node(db, anime_details, RelatedAnime, 'related_anime', 'id', 'title')
-        insert_sub_table_with_node(db, anime_details, Recommendation, 'recommendations', 'id', 'title')
-        print("Finished insert anime.\n")
+    # # Insert all data into database.
+    # for node in get_all_anime():
+    #     node = node['node']
+    #     anime_id = node['id']
+    #     anime_details = get_anime_by_id(anime_id)
+    #     anime = Anime(
+    #         anime_details['id'],
+    #         anime_details['title'],
+    #         int(anime_details['rank']),
+    #         int(anime_details['popularity']),
+    #         anime_details['media_type'],
+    #         anime_details['status'],
+    #         anime_details['rating']
+    #     )
+    #     try:
+    #         # insert anime
+    #         db.session.add(anime)
+    #         db.session.commit()
+    #         print(f"Finished add Anime: {anime.title}")
+    #     except Exception as e:
+    #         print(e)
+    #         db.session.rollback()
+    #
+    #     insert_sub_table(db, anime_details, Genre, 'genres', 'id', 'name')
+    #     insert_sub_table(db, anime_details, Studio, 'studios', 'id', 'name')
+    #     insert_sub_table_with_node(db, anime_details, RelatedAnime, 'related_anime', 'id', 'title')
+    #     insert_sub_table_with_node(db, anime_details, Recommendation, 'recommendations', 'id', 'title')
+    #     print("Finished insert anime.\n")
+    #
+    # link_association(db, Genre, 'genres')
+    # link_association(db, Studio, 'studios')
+    # link_association_with_node(db, RelatedAnime, 'related_anime')
+    # link_association_with_node(db, Recommendation, 'recommendations')
 
-    link_association(db, Genre, 'genres')
-    link_association(db, Studio, 'studios')
-    link_association_with_node(db, RelatedAnime, 'related_anime')
-    link_association_with_node(db, Recommendation, 'recommendations')
+    insert_manga_table(db)
+    # insert_theme_table(db)
