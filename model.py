@@ -106,7 +106,7 @@ class Anime(db.Model):
                                     backref=db.backref('animes', lazy='dynamic'))
     related_manga = db.relationship('Manga',
                                     secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
-    recommendation = db.relationship('Recommendation',
+    recommendations = db.relationship('Recommendation',
                                      secondary=association_recommendations_table,
                                      backref=db.backref('animes', lazy='dynamic'))
 
@@ -125,16 +125,26 @@ class Anime(db.Model):
         self.rating = rating
 
     def get_dict(self):
+        genre_list = []
+        studio_list = []
+        recommendation_list = []
+        for genre in self.genres:
+            genre_list.append(genre.name)
+        for studio in self.studios:
+            studio_list.append(studio.name)
+        for recommendation in self.recommendations:
+            recommendation_list.append(recommendation.title)
         return {
             '_id': self.id,
             'mal_id': self.mal_id,
             'title': self.title,
             'rank': self.rank,
             'popularity': self.popularity,
-            'genres': self.genres,
+            'genres': genre_list,
             'media_type': self.media_type,
             'status': self.status,
-            'studios': self.studios
+            'studios': studio_list,
+            'recommendation': recommendation_list
         }
 
 
