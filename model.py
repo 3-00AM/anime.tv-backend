@@ -62,6 +62,14 @@ association_mangas_table = db.Table('association_mangas',
                                               db.ForeignKey('manga.id')),
                                     )
 
+"""Association table for Anime an Theme"""
+association_themes_table = db.Table('association_themes',
+                                    db.Column('anime_id', db.Integer,
+                                              db.ForeignKey('anime.id')),
+                                    db.Column('theme_id', db.Integer,
+                                              db.ForeignKey('theme.id')),
+                                    )
+
 """Association table for Anime an Recommendation"""
 association_recommendations_table = db.Table('association_recommendations',
                                              db.Column(
@@ -105,11 +113,13 @@ class Anime(db.Model):
     related_anime = db.relationship('RelatedAnime',
                                     secondary=association_related_animes_table,
                                     backref=db.backref('animes', lazy='dynamic'))
-    # related_manga = db.relationship('Manga',
-    #                                 secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
+    related_manga = db.relationship('Manga',
+                                    secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
     recommendations = db.relationship('Recommendation',
                                       secondary=association_recommendations_table,
                                       backref=db.backref('animes', lazy='dynamic'))
+    related_theme = db.relationship('Theme',
+                                    secondary=association_themes_table, backref=db.backref('animes', lazy='dynamic'))
 
     # db.Column(db.Date)
     # db.Column(db.Text())
