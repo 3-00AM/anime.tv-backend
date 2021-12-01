@@ -3,9 +3,8 @@ from flask import request
 import json
 
 @app.route('/', methods=['GET'])
-def hello_world():  # put application's code here
+def hello_world():
     return json.dumps({'feedback': 'End of the world!!! ~~ sono chi no kioku ~~'})
-
 
 @app.route('/index', methods=['GET'])
 def index():
