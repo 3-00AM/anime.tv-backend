@@ -1,0 +1,16 @@
+tags:
+  - name: Theme Search
+summary: Send html template that display searched theme information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display searched theme
+  400:
+    description: Bad request
+parameters:
+  - in: query
+    name: keyword
+    type: string

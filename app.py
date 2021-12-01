@@ -63,10 +63,10 @@ def genre():
 @app.route('/anime/search', methods=['GET'])
 @swag_from("swagger/anime_search_get.yml")
 def anime_search():
-    title = request.args.get('keyword')
+    keyword = request.args.get('keyword')
     anime_list = []
     for a in db.session.query(Anime).all():
-        if title.lower() in a.title.lower():
+        if keyword.lower() in a.title.lower():
             anime_list.append(a.get_dict())
     return json.dumps(anime_list)
 
@@ -74,10 +74,10 @@ def anime_search():
 @app.route('/genre/search', methods=['GET'])
 @swag_from("swagger/genre_search_get.yml")
 def genre_search():
-    name = request.args.get('keyword')
+    keyword = request.args.get('keyword')
     genre_list = []
     for g in db.session.query(Genre).all():
-        if name.lower() in g.name.lower():
+        if keyword.lower() in g.name.lower():
             genre_list.append(g.get_dict())
     return json.dumps(genre_list)
 
@@ -94,10 +94,10 @@ def manga():
 @app.route('/manga/search', methods=['GET'])
 @swag_from("swagger/manga_search_get.yml")
 def manga_search():
-    title = request.args.get('keyword')
+    keyword = request.args.get('keyword')
     manga_list = []
     for manga in db.session.query(Manga).all():
-        if title.lower() in manga.title.lower():
+        if keyword.lower() in manga.title.lower():
             manga_list.append(manga.get_dict())
     return json.dumps(manga_list)
 
@@ -108,6 +108,17 @@ def theme():
     theme_list = []
     for theme in db.session.query(Theme).all():
         theme_list.append(theme.get_dict())
+    return json.dumps(theme_list)
+
+
+@app.route('/theme/search', methods=['GET'])
+@swag_from("swagger/theme_search_get.yml")
+def theme_search():
+    keyword = request.args.get('keyword')
+    theme_list = []
+    for theme in db.session.query(Theme).all():
+        if keyword.lower() in theme.title.lower():
+            theme_list.append(theme.get_dict())
     return json.dumps(theme_list)
 
 
