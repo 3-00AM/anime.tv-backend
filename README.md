@@ -1,5 +1,7 @@
 # Anime.tv - Backend Service
 
+![img.png](https://i.imgur.com/3bWcdel.png)
+
 ## Team Members
 
 | Name                 | GitHub ID                                       |
