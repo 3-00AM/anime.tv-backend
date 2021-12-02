@@ -22,7 +22,7 @@ headers = {
 
 
 def get_all_anime():
-    url = "https://api.myanimelist.net/v2/anime/ranking?ranking_type=all&limit=10"
+    url = "https://api.myanimelist.net/v2/anime/ranking?ranking_type=all&limit=500"
 
     response = requests.request(
         "GET", url, headers=headers, data=payload).json()
@@ -222,9 +222,9 @@ if __name__ == '__main__':
         insert_manga_table(db, anime)
         insert_theme_table(db, anime)
 
-    link_association(db, Genre, 'genres')
-    link_association(db, Studio, 'studios')
-    link_association_with_node(db, RelatedAnime, 'related_anime')
-    link_association_with_node(db, Recommendation, 'recommendations')
-    link_manga_association(db)
-    link_theme_association(db)
+    # link_association(db, Genre, 'genres')
+    # link_association(db, Studio, 'studios')
+    # link_association_with_node(db, RelatedAnime, 'related_anime')
+    # link_association_with_node(db, Recommendation, 'recommendations')
+    # link_manga_association(db)
+    # link_theme_association(db)
