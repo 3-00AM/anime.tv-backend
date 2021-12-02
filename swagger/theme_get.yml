@@ -1,0 +1,12 @@
+tags:
+  - name: Theme
+summary: Send html template that display theme's information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display all themes
+  400:
+    description: Bad request

@@ -1,3 +1,6 @@
+from enum import unique
+from turtle import title
+
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -43,13 +46,14 @@ association_studios_table = db.Table('association_studios',
                                                db.ForeignKey('studio.id')),
                                      )
 
-"""Association table for Anime an RelatedAnime"""
+"""Association table for Anime and RelatedAnime"""
 association_related_animes_table = db.Table('association_related_animes',
                                             db.Column(
                                                 'anime_id', db.Integer, db.ForeignKey('anime.id')),
                                             db.Column('related_anime_id', db.Integer,
                                                       db.ForeignKey('related_anime.id')),
                                             )
+
 
 """Association table for Anime an Manga"""
 association_mangas_table = db.Table('association_mangas',
@@ -59,7 +63,16 @@ association_mangas_table = db.Table('association_mangas',
                                               db.ForeignKey('manga.id')),
                                     )
 
-"""Association table for Anime an Recommendation"""
+
+"""Association table for Anime and Theme"""
+association_themes_table = db.Table('association_themes',
+                                    db.Column('anime_id', db.Integer,
+                                              db.ForeignKey('anime.id')),
+                                    db.Column('theme_id', db.Integer,
+                                              db.ForeignKey('theme.id')),
+                                    )
+
+"""Association table for Anime and Recommendation"""
 association_recommendations_table = db.Table('association_recommendations',
                                              db.Column(
                                                  'anime_id', db.Integer, db.ForeignKey('anime.id')),
@@ -105,8 +118,10 @@ class Anime(db.Model):
     related_manga = db.relationship('Manga',
                                     secondary=association_mangas_table, backref=db.backref('animes', lazy='dynamic'))
     recommendations = db.relationship('Recommendation',
-                                     secondary=association_recommendations_table,
-                                     backref=db.backref('animes', lazy='dynamic'))
+                                      secondary=association_recommendations_table,
+                                      backref=db.backref('animes', lazy='dynamic'))
+    related_theme = db.relationship('Theme',
+                                    secondary=association_themes_table, backref=db.backref('animes', lazy='dynamic'))
 
     # db.Column(db.Date)
     # db.Column(db.Text())
@@ -125,13 +140,22 @@ class Anime(db.Model):
     def get_dict(self):
         genre_list = []
         studio_list = []
+        related_anime_list = []
+        related_manga_list = []
         recommendation_list = []
+        related_theme_list = []
         for genre in self.genres:
-            genre_list.append(genre.name)
+            genre_list.append(genre.get_dict())
+        for manga in self.related_manga:
+            related_manga_list.append(manga.get_dict())
         for studio in self.studios:
-            studio_list.append(studio.name)
+            studio_list.append(studio.get_dict())
+        for related_anime in self.related_anime:
+            related_anime_list.append(related_anime.get_dict())
         for recommendation in self.recommendations:
-            recommendation_list.append(recommendation.title)
+            recommendation_list.append(recommendation.get_dict())
+        for related_theme in self.related_theme:
+            related_theme_list.append(related_theme.get_dict())
         return {
             '_id': self.id,
             'mal_id': self.mal_id,
@@ -142,7 +166,10 @@ class Anime(db.Model):
             'media_type': self.media_type,
             'status': self.status,
             'studios': studio_list,
-            'recommendation': recommendation_list
+            'related_anime': related_anime_list,
+            'related_manga': related_manga_list,
+            'recommendations': recommendation_list,
+            'related_theme': related_theme_list,
         }
 
 
@@ -226,22 +253,22 @@ class Manga(db.Model):
     A class to represent a genre.
     Attributes:
         id           (int):  manga ID
-        mal_id       (int):  My Anime List id
+        kitsu_id     (int):  My Anime List id
         title    (varchar):  manga title
     """
     __tablename__ = 'manga'
     id = db.Column(db.Integer, primary_key=True)  # primary key
-    mal_id = db.Column(db.Integer, unique=True)
+    kitsu_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
 
-    def __init__(self, mal_id, title):
-        self.mal_id = mal_id
+    def __init__(self, kitsu_id, title):
+        self.kitsu_id = kitsu_id
         self.title = title
 
     def get_dict(self):
         return {
             '_id': self.id,
-            'mal_id': self.mal_id,
+            'kitsu_id': self.kitsu_id,
             'title': self.title,
         }
 
@@ -265,7 +292,32 @@ class Recommendation(db.Model):
 
     def get_dict(self):
         return {
-            'id': self.id,
+            '_id': self.id,
             'mal_id': self.mal_id,
             'title': self.title,
+        }
+
+
+class Theme(db.Model):
+    """
+    A Class to represent a Theme table.
+    Attributes:
+        id              (int): theme ID.
+        title       (varchar): title of theme.
+        type        (varchar): type of that songs eg. opening, ending.
+    """
+    __tablename__ = 'theme'
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    title = db.Column(db.String(200), unique=True)
+    type = db.Column(db.String(200))
+
+    def __init__(self, title, type):
+        self.title = title
+        self.type = type
+
+    def get_dict(self):
+        return {
+            '_id': self.id,
+            'title': self.title,
+            'type': self.type
         }
