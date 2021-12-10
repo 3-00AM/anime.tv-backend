@@ -22,19 +22,16 @@ headers = {
 
 
 def get_all_anime():
-    url = "https://api.myanimelist.net/v2/anime/ranking?ranking_type=all&limit=500"
+    url = "https://api.myanimelist.net/v2/anime/ranking?ranking_type=all&limit=10"
 
     response = requests.request(
         "GET", url, headers=headers, data=payload).json()
-
-    # try:
-    #     data = Anime(title, rank)
 
     return response['data']
 
 
 def get_anime_by_id(anime_id):
-    url = f"https://api.myanimelist.net/v2/anime/{anime_id}?fields=id,title,rank,popularity,media_type,status,rating,studios,genres,related_anime,recommendations"
+    url = f"https://api.myanimelist.net/v2/anime/{anime_id}?fields=id,title,mean,rank,popularity,media_type,status,rating,studios,genres,related_anime,recommendations"
 
     response = requests.request(
         "GET", url, headers=headers, data=payload).json()
@@ -146,6 +143,7 @@ def link_manga_association(db):
                     except Exception as exception:
                         print(f"Failed to Link Manga: {x.title} and Anime: {a.title}")
 
+
 def link_theme_association(db):
     for a in db.session.query(Anime).all():
         try:
@@ -200,6 +198,7 @@ if __name__ == '__main__':
         anime = Anime(
             anime_details['id'],
             anime_details['title'],
+            float(anime_details['mean']),
             int(anime_details['rank']),
             int(anime_details['popularity']),
             anime_details['media_type'],

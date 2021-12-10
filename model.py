@@ -88,6 +88,7 @@ class Anime(db.Model):
         id                      (int):  anime ID
         mal_id                  (int):  My Anime List id
         title               (varchar):  anime title
+        mean                 (number):  mean of the anime
         rank                    (int):  rank of the anime
         popularity              (int):      
         genres              (varchar):  genre of the anime
@@ -103,6 +104,7 @@ class Anime(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # primary key
     mal_id = db.Column(db.Integer, unique=True)
     title = db.Column(db.String(200))
+    mean = db.Column(db.Float)
     rank = db.Column(db.Integer)
     popularity = db.Column(db.Integer)
     genres = db.relationship('Genre',
@@ -128,9 +130,10 @@ class Anime(db.Model):
     # db.Column(db.Boolean)
     # db.Column(db.PickleType())
 
-    def __init__(self, mal_id, title, rank, popularity, media_type, status, rating):
+    def __init__(self, mal_id, title, mean, rank, popularity, media_type, status, rating):
         self.mal_id = mal_id
         self.title = title
+        self.mean = mean
         self.rank = rank
         self.popularity = popularity
         self.media_type = media_type
@@ -160,6 +163,7 @@ class Anime(db.Model):
             '_id': self.id,
             'mal_id': self.mal_id,
             'title': self.title,
+            'mean': self.mean,
             'rank': self.rank,
             'popularity': self.popularity,
             'genres': genre_list,
