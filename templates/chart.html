@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Questionnaire</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/cirrus-ui">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+          integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
+<body>
+<div class="hero fullscreen background__blue">
+    <div class="content u-center">
+        <h1>Anime score vs reviewer score</h1>
+        <canvas id="lineChart" width="900" height="400"></canvas>
+        <div class="space"></div>
+        <div class="u-pull-right">
+            <a href="index.html">
+                <button class="btn"><- Back</button>
+            </a>
+        </div>
+        <div class="space"></div>
+    </div>
+    <script>
+        let anime_data = [];
+        let review_data = [];
+        let anime_title = [];
+
+        $.getJSON("http://127.0.0.1:5000/anime").success((data) => {
+            for (const element of data) {
+                anime_data.push(element["mean"]);
+                anime_title.push(element["title"]);
+            }
+        }).then(() => {
+            $.getJSON("http://127.0.0.1:5000/review").success((data) => {
+                for (const element of data) {
+                    review_data.push(element["score"]);
+                }
+            }).then(() => {
+                console.log("Anime Data: ");
+                console.log(anime_data);
+
+                console.log("Review Data: ");
+                console.log(review_data);
+
+                let ctx = document.getElementById('lineChart').getContext('2d');
+                let data = {
+                    labels: anime_title,
+                    datasets: [
+                        {
+                            label: "Anime Score",
+                            data: anime_data,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)'
+                            ],
+                            borderWidth: 1
+                        },
+                        {
+                            label: "Reviewer Score",
+                            data: review_data,
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(75, 192, 192)'
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                }
+
+                let myBarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+
+                })
+            });
+        });
+    </script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/cirrus-ui@0.6.2/dist/cirrus.min.css"></script>
+</body>
+</html>
