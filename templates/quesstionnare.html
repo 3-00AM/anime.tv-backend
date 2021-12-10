@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="main.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
 <body>
-<div class="background__blue">
+<div class="hero fullscreen background__blue">
     <div class="content u-center">
         <h1>Anime score vs reviewer score</h1>
         <canvas id="lineChart" width="900" height="400"></canvas>
@@ -23,18 +23,75 @@
         <div class="space"></div>
     </div>
     <script>
+        let anime_data = [];
+        let review_data = [];
 
-        fetch()
+        async function get_score(url, key, array) {
+            let resp_anime = await fetch(url, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            let result = await resp_anime.json()
+
+            for (const element of result) {
+                let mean = element[key]
+                array.push(mean)
+            }
+        }
+
+        get_score("http://localhost:8080/anime", "mean", anime_data)
+        get_score("http://localhost:8080/review", "score", review_data)
+
+        console.log("Anime Data: ")
+        console.log(anime_data)
+
+        console.log("Review Data: ")
+        console.log(review_data)
 
         let ctx = document.getElementById('lineChart').getContext('2d');
         let data = {
             labels: ['Anime Score', 'Reviewer Score'],
-            datasets: [{
-                label: "Blue",
-                fillColor: "blue",
-                data:
-            }]
+            datasets: [
+                {
+                    label: "Anime Score",
+                    data: anime_data,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)'
+                    ],
+                    borderWidth: 1
+                },
+                {
+                    label: "Reviewer Score",
+                    data: review_data,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgb(75, 192, 192)'
+                    ],
+                    borderWidth: 1
+                }
+            ]
         }
+
+        let myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+
+        })
     </script>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/cirrus-ui@0.6.2/dist/cirrus.min.css"></script>
