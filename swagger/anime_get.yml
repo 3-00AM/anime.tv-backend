@@ -8,5 +8,115 @@ produces:
 responses:
   200:
     description: Return html template display all anime
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: integer
+            example: 1
+          mal_id:
+            type: integer
+            example: 5114
+          title:
+            type: string
+            example: "Fullmetal Alchemist: Brotherhood"
+          rank:
+            type: integer
+            example: 1
+          popularity:
+            type: integer
+            example: 3
+          genres:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: integer
+                  example: 1
+                mal_id:
+                  type: integer
+                  example: 1
+                name:
+                  type: string
+                  example: "Action"
+          media_type:
+            type: string
+            example: "tv"
+          status:
+            type: string
+            example: "finished_airing"
+          studios:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: integer
+                  example: 1
+                mal_id:
+                  type: integer
+                  example: 4
+                name:
+                  type: string
+                  example: "Bones"
+          related_anime:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: integer
+                  example: 1
+                mal_id:
+                  type: integer
+                  example: 121
+                title:
+                  type: string
+                  example: "Fullmetal Alchemist"
+          related_manga:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: integer
+                  example: 1
+                kitsu_id:
+                  type: integer
+                  example: 66
+                title:
+                  type: string
+                  example: "Fullmetal Alchemist"
+          recommendations:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: integer
+                  example: 1
+                mal_id:
+                  type: integer
+                  example: 11061
+                title:
+                  type: string
+                  example: "Hunter x Hunter (2011)"
+          related_theme:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: integer
+                  example: 1
+                title:
+                  type: string
+                  example: "again"
+                type:
+                  type: string
+                  example: "Opening"
   400:
     description: Bad request
