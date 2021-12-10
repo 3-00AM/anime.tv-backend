@@ -19,6 +19,9 @@ responses:
           mal_id:
             type: integer
             example: 5114
+          mean:
+            type: number
+            example: 9.15
           title:
             type: string
             example: "Fullmetal Alchemist: Brotherhood"
