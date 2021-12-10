@@ -1,5 +1,5 @@
 from model import *
-from flask import request
+from flask import request, jsonify
 from flasgger.utils import swag_from
 from flasgger import Swagger
 import json
@@ -48,7 +48,7 @@ def anime():
     anime_list = []
     for anime in db.session.query(Anime).all():
         anime_list.append(anime.get_dict())
-    return json.dumps(anime_list)
+    return jsonify(anime_list)
 
 
 @app.route('/anime/search', methods=['GET'])
@@ -75,7 +75,7 @@ def anime_search():
                     anime_list.append(anime_dict)
                     continue
 
-    return json.dumps(anime_list)
+    return jsonify(anime_list)
 
 
 @app.route('/genre', methods=['GET'])
@@ -84,7 +84,7 @@ def genre():
     genre_list = []
     for g in db.session.query(Genre).all():
         genre_list.append(g.get_dict())
-    return json.dumps(genre_list)
+    return jsonify(genre_list)
 
 
 @app.route('/genre/search', methods=['GET'])
@@ -95,7 +95,7 @@ def genre_search():
     for g in db.session.query(Genre).all():
         if keyword.lower() in g.name.lower():
             genre_list.append(g.get_dict())
-    return json.dumps(genre_list)
+    return jsonify(genre_list)
 
 
 @app.route('/studio', methods=['GET'])
@@ -104,7 +104,7 @@ def studio():
     studio_list = []
     for studio in db.session.query(Studio).all():
         studio_list.append(studio.get_dict())
-    return json.dumps(studio_list)
+    return jsonify(studio_list)
 
 
 @app.route('/studio/search', methods=['GET'])
@@ -115,7 +115,7 @@ def studio_search():
     for studio in db.session.query(Studio).all():
         if keyword.lower() in studio.name.lower():
             studio_list.append(studio.get_dict())
-    return json.dumps(studio_list)
+    return jsonify(studio_list)
 
 
 @app.route('/manga', methods=['GET'])
@@ -124,7 +124,7 @@ def manga():
     manga_list = []
     for manga in db.session.query(Manga).all():
         manga_list.append(manga.get_dict())
-    return json.dumps(manga_list)
+    return jsonify(manga_list)
 
 
 @app.route('/manga/search', methods=['GET'])
@@ -135,7 +135,7 @@ def manga_search():
     for manga in db.session.query(Manga).all():
         if keyword.lower() in manga.title.lower():
             manga_list.append(manga.get_dict())
-    return json.dumps(manga_list)
+    return jsonify(manga_list)
 
 
 @app.route('/theme', methods=['GET'])
@@ -144,7 +144,7 @@ def theme():
     theme_list = []
     for theme in db.session.query(Theme).all():
         theme_list.append(theme.get_dict())
-    return json.dumps(theme_list)
+    return jsonify(theme_list)
 
 
 @app.route('/theme/search', methods=['GET'])
@@ -155,7 +155,7 @@ def theme_search():
     for theme in db.session.query(Theme).all():
         if keyword.lower() in theme.title.lower():
             theme_list.append(theme.get_dict())
-    return json.dumps(theme_list)
+    return jsonify(theme_list)
 
 
 if __name__ == '__main__':
