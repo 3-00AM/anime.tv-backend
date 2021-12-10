@@ -20,7 +20,7 @@ responses:
             type: string
             example: "Fullmetal Alchemist: Brotherhood"
           score:
-            type: integer
-            example: 10
+            type: number
+            example: 10.0
   400:
     description: Bad request
