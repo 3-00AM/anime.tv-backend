@@ -1,0 +1,26 @@
+tags:
+  - name: Review
+summary: Send html template that display review's information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display all reviews
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: integer
+            example: 1
+          title:
+            type: string
+            example: "Fullmetal Alchemist: Brotherhood"
+          score:
+            type: integer
+            example: 10
+  400:
+    description: Bad request

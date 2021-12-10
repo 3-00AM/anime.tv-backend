@@ -1,0 +1,30 @@
+tags:
+  - name: Review Search
+summary: Send html template that display searched review information
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+responses:
+  200:
+    description: Return html template display searched review
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: integer
+            example: 1
+          title:
+            type: string
+            example: "Fullmetal Alchemist: Brotherhood"
+          score:
+            type: integer
+            example: 10
+  400:
+    description: Bad request
+parameters:
+  - in: query
+    name: keyword
+    type: string

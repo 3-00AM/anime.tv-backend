@@ -348,5 +348,5 @@ class Review(db.Model):
         return {
             '_id': self.id,
             'title': self.title,
-            'score': self.type
+            'score': self.score
         }

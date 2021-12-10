@@ -158,5 +158,25 @@ def theme_search():
     return jsonify(theme_list)
 
 
+@app.route('/review', methods=['GET'])
+@swag_from("swagger/review_get.yml")
+def review():
+    review_list = []
+    for review in db.session.query(Review).all():
+        review_list.append(review.get_dict())
+    return jsonify(review_list)
+
+
+@app.route('/review/search', methods=['GET'])
+@swag_from("swagger/review_search_get.yml")
+def review_search():
+    keyword = request.args.get('keyword')
+    review_list = []
+    for review in db.session.query(Review).all():
+        if keyword.lower() in review.title.lower() or keyword.lower() in str(review.score):
+            review_list.append(review.get_dict())
+    return jsonify(review_list)
+
+
 if __name__ == '__main__':
     app.run()
