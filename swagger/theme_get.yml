@@ -8,5 +8,19 @@ produces:
 responses:
   200:
     description: Return html template display all themes
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: integer
+            example: 1
+          title:
+            type: string
+            example: "again"
+          type:
+            type: string
+            example: "Opening"
   400:
     description: Bad request

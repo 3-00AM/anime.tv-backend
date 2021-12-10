@@ -8,5 +8,19 @@ produces:
 responses:
   200:
     description: Return html template display all genres
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: integer
+            example: 1
+          mal_id:
+            type: integer
+            example: 1
+          name:
+            type: string
+            example: "Action"
   400:
     description: Bad request

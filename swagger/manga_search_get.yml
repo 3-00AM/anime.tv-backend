@@ -8,6 +8,20 @@ produces:
 responses:
   200:
     description: Return html template display searched manga
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: integer
+            example: 1
+          kitsu_id:
+            type: integer
+            example: 66
+          title:
+            type: string
+            example: "Fullmetal Alchemist"
   400:
     description: Bad request
 parameters:
