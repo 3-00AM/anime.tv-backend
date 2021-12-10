@@ -325,3 +325,28 @@ class Theme(db.Model):
             'title': self.title,
             'type': self.type
         }
+
+
+class Review(db.Model):
+    """
+    A Class to represent a Review table.
+    Attributes:
+        id              (int): review ID.
+        title       (varchar): title of anime.
+        score        (varchar): score that user review.
+    """
+    __tablename__ = 'review'
+    id = db.Column(db.Integer, primary_key=True)  # primary key
+    title = db.Column(db.String(200), unique=True)
+    score = db.Column(db.Float)
+
+    def __init__(self, title, score):
+        self.title = title
+        self.score = score
+
+    def get_dict(self):
+        return {
+            '_id': self.id,
+            'title': self.title,
+            'score': self.type
+        }
