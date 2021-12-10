@@ -8,17 +8,12 @@
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
     <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
 <body>
 <div class="background__blue">
     <div class="content u-center">
-        <h1>Questionnaire</h1>
-        <iframe width="600" height="371" seamless frameborder="0" scrolling="no"
-                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vT2wEaf64zNMeDeQbFqNnwsFBZRj0ObWltFgZtWtFOsJo-AjasaDPxTwGE_T9ktp1V9z8SaZTYfSaen/pubchart?oid=153488628&amp;format=interactive">
-        </iframe>
-        <div class="space"></div>
-        <iframe width="600" height="371" seamless frameborder="0" scrolling="no"
-                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vT2wEaf64zNMeDeQbFqNnwsFBZRj0ObWltFgZtWtFOsJo-AjasaDPxTwGE_T9ktp1V9z8SaZTYfSaen/pubchart?oid=142057943&amp;format=interactive">
-        </iframe>
+        <h1>Anime score vs reviewer score</h1>
+        <canvas id="lineChart" width="900" height="400"></canvas>
         <div class="space"></div>
         <div class="u-pull-right">
             <a href="index.html">
@@ -27,6 +22,20 @@
         </div>
         <div class="space"></div>
     </div>
+    <script>
+
+        fetch()
+
+        let ctx = document.getElementById('lineChart').getContext('2d');
+        let data = {
+            labels: ['Anime Score', 'Reviewer Score'],
+            datasets: [{
+                label: "Blue",
+                fillColor: "blue",
+                data:
+            }]
+        }
+    </script>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/cirrus-ui@0.6.2/dist/cirrus.min.css"></script>
 </body>
